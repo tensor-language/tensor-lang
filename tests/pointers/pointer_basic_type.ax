@@ -1,0 +1,13 @@
+//@test(expect = "value=42")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+    let x: int32 = 42
+    let ptr: *int32 = &x
+    printf("value=%d\n", *ptr)
+    return 0
+}

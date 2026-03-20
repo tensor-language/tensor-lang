@@ -1,0 +1,14 @@
+//@test(expect = "float64=2.718281828459045")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x: float64 = 2.718281828459045
+    printf("float64=%.15f\n", x)
+
+    return 0
+}

@@ -1,0 +1,14 @@
+//@test(expect = "char=Z")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let ch: char = 'Z'
+    printf("char=%c\n", ch)
+
+    return 0
+}

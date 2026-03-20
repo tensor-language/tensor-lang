@@ -1,0 +1,15 @@
+//@test(expect = "signed=-1")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let big: uint32 = 4294967295
+    let neg: int32 = cast<int32>(big)
+    printf("signed=%d\n", neg)
+
+    return 0
+}

@@ -1,0 +1,14 @@
+//@test(expect = "pi=3.14")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let pi: float32 = 3.14
+    printf("pi=%.2f\n", pi)
+
+    return 0
+}

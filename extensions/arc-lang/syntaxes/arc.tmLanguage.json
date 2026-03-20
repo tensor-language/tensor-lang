@@ -1,0 +1,486 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Arc",
+  "scopeName": "source.arc",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#chars" },
+    { "include": "#attributes" },
+    { "include": "#extern-blocks" },
+    { "include": "#definitions" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#constants" },
+    { "include": "#functions" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.arc",
+          "begin": "/\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "comment.line.double-slash.arc",
+          "begin": "//",
+          "end": "$"
+        }
+      ]
+    },
+
+    "strings": {
+      "name": "string.quoted.double.arc",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.arc",
+          "match": "\\\\([\"\\\\nrt0]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})"
+        }
+      ]
+    },
+
+    "chars": {
+      "name": "string.quoted.single.arc",
+      "begin": "'",
+      "end": "'",
+      "patterns": [
+        {
+          "name": "constant.character.escape.arc",
+          "match": "\\\\(['\\\\ nrt0]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})"
+        }
+      ]
+    },
+
+    "attributes": {
+      "patterns": [
+        {
+          "comment": "@attribute(args)",
+          "match": "(@)([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": { "name": "punctuation.decorator.arc" },
+            "2": { "name": "entity.name.decorator.arc" }
+          }
+        },
+        {
+          "comment": "@attribute",
+          "match": "(@)([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "punctuation.decorator.arc" },
+            "2": { "name": "entity.name.decorator.arc" }
+          }
+        }
+      ]
+    },
+
+    "extern-blocks": {
+      "patterns": [
+        {
+          "comment": "extern c { }",
+          "begin": "\\b(extern)\\s+(c)\\s*(\\{)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "storage.modifier.arc" },
+            "3": { "name": "punctuation.section.block.begin.arc" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.block.end.arc" }
+          },
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#strings" },
+            { "include": "#calling-conventions" },
+            { "include": "#extern-type-alias" },
+            { "include": "#extern-func-decl" },
+            { "include": "#types" },
+            { "include": "#constants" },
+            { "include": "#operators" },
+            { "include": "#extern-keywords" }
+          ]
+        },
+        {
+          "comment": "extern cpp { }",
+          "begin": "\\b(extern)\\s+(cpp)\\s*(\\{)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "storage.modifier.arc" },
+            "3": { "name": "punctuation.section.block.begin.arc" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.block.end.arc" }
+          },
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#strings" },
+            { "include": "#calling-conventions" },
+            { "include": "#extern-type-alias" },
+            { "include": "#extern-func-decl" },
+            { "include": "#extern-cpp-namespace" },
+            { "include": "#extern-cpp-class" },
+            { "include": "#types" },
+            { "include": "#constants" },
+            { "include": "#operators" },
+            { "include": "#extern-keywords" }
+          ]
+        },
+        {
+          "comment": "extern objc { }",
+          "begin": "\\b(extern)\\s+(objc)\\s*(\\{)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "storage.modifier.arc" },
+            "3": { "name": "punctuation.section.block.begin.arc" }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": { "name": "punctuation.section.block.end.arc" }
+          },
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#strings" },
+            { "include": "#extern-type-alias" },
+            { "include": "#extern-func-decl" },
+            { "include": "#types" },
+            { "include": "#constants" },
+            { "include": "#operators" },
+            { "include": "#extern-keywords" }
+          ]
+        }
+      ]
+    },
+
+    "extern-keywords": {
+      "match": "\\b(func|type|namespace|class|abstract|virtual|static|const|new|delete|opaque|void)\\b",
+      "name": "keyword.control.arc"
+    },
+
+    "calling-conventions": {
+      "match": "\\b(cdecl|stdcall|fastcall|vectorcall|thiscall)\\b",
+      "name": "storage.modifier.arc"
+    },
+
+    "extern-func-decl": {
+      "match": "\\b(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+      "captures": {
+        "1": { "name": "keyword.control.arc" },
+        "2": { "name": "entity.name.function.arc" }
+      }
+    },
+
+    "extern-type-alias": {
+      "match": "\\b(type)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+      "captures": {
+        "1": { "name": "keyword.control.arc" },
+        "2": { "name": "entity.name.type.arc" }
+      }
+    },
+
+    "extern-cpp-namespace": {
+      "begin": "\\b(namespace)\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z0-9_]*)*)\\s*(\\{)",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.arc" },
+        "2": { "name": "entity.name.namespace.arc" },
+        "3": { "name": "punctuation.section.block.begin.arc" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.block.end.arc" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#strings" },
+        { "include": "#calling-conventions" },
+        { "include": "#extern-type-alias" },
+        { "include": "#extern-func-decl" },
+        { "include": "#extern-cpp-namespace" },
+        { "include": "#extern-cpp-class" },
+        { "include": "#types" },
+        { "include": "#constants" },
+        { "include": "#operators" },
+        { "include": "#extern-keywords" }
+      ]
+    },
+
+    "extern-cpp-class": {
+      "begin": "\\b(abstract\\s+)?(class)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(\"[^\"]*\"))?",
+      "beginCaptures": {
+        "1": { "name": "storage.modifier.arc" },
+        "2": { "name": "keyword.control.arc" },
+        "3": { "name": "entity.name.type.class.arc" },
+        "4": { "name": "string.quoted.double.arc" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.block.end.arc" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#strings" },
+        { "include": "#calling-conventions" },
+        { "include": "#extern-func-decl" },
+        { "include": "#types" },
+        { "include": "#constants" },
+        { "include": "#operators" },
+        { "include": "#extern-keywords" }
+      ]
+    },
+
+    "definitions": {
+      "patterns": [
+        {
+          "comment": "gpu func name",
+          "match": "\\b(gpu)\\s+(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "storage.modifier.arc" },
+            "2": { "name": "keyword.control.arc" },
+            "3": { "name": "entity.name.function.arc" }
+          }
+        },
+        {
+          "comment": "async func name",
+          "match": "\\b(async)\\s+(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "storage.modifier.arc" },
+            "2": { "name": "keyword.control.arc" },
+            "3": { "name": "entity.name.function.arc" }
+          }
+        },
+        {
+          "comment": "func name",
+          "match": "\\b(func)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "entity.name.function.arc" }
+          }
+        },
+        {
+          "comment": "deinit (",
+          "match": "\\b(deinit)\\s*(?=\\()",
+          "captures": {
+            "1": { "name": "keyword.control.arc" }
+          }
+        },
+        {
+          "comment": "interface Name",
+          "match": "\\b(interface)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "entity.name.type.interface.arc" }
+          }
+        },
+        {
+          "comment": "enum Name",
+          "match": "\\b(enum)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "entity.name.type.enum.arc" }
+          }
+        },
+        {
+          "comment": "namespace foo or namespace foo.bar",
+          "match": "\\b(namespace)\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z0-9_]*)*)",
+          "captures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "entity.name.namespace.arc" }
+          }
+        },
+        {
+          "comment": "type Foo = ...",
+          "match": "\\b(type)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control.arc" },
+            "2": { "name": "entity.name.type.arc" }
+          }
+        }
+      ]
+    },
+
+    "keywords": {
+      "patterns": [
+        {
+          "comment": "Control flow",
+          "name": "keyword.control.arc",
+          "match": "\\b(if|else|switch|case|default|for|in|break|continue|return|defer|await)\\b"
+        },
+        {
+          "comment": "Concurrency",
+          "name": "keyword.control.arc",
+          "match": "\\b(async|process|gpu)\\b"
+        },
+        {
+          "comment": "Declaration keywords",
+          "name": "keyword.control.arc",
+          "match": "\\b(func|interface|enum|deinit|type|namespace|extern|import)\\b"
+        },
+        {
+          "comment": "Storage and modifiers",
+          "name": "storage.modifier.arc",
+          "match": "\\b(let|const|var|new|delete|static|abstract|virtual|mut|opaque)\\b"
+        },
+        {
+          "comment": "Self reference",
+          "name": "variable.language.self.arc",
+          "match": "\\b(self)\\b"
+        },
+        {
+          "comment": "Null literal (keyword context)",
+          "name": "constant.language.null.arc",
+          "match": "\\b(null)\\b"
+        }
+      ]
+    },
+
+    "types": {
+      "patterns": [
+        {
+          "comment": "Primitive types",
+          "name": "storage.type.primitive.arc",
+          "match": "\\b(int8|int16|int32|int64|uint8|uint16|uint32|uint64|usize|isize|float32|float64|byte|bool|char|string|void)\\b"
+        },
+        {
+          "comment": "Collection type keywords",
+          "name": "storage.type.arc",
+          "match": "\\b(vector|map)\\b"
+        }
+      ]
+    },
+
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.arc",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.language.null.arc",
+          "match": "\\b(null)\\b"
+        },
+        {
+          "name": "constant.numeric.hex.arc",
+          "match": "\\b0[xX][0-9a-fA-F][0-9a-fA-F_]*\\b"
+        },
+        {
+          "name": "constant.numeric.binary.arc",
+          "match": "\\b0[bB][01][01_]*\\b"
+        },
+        {
+          "name": "constant.numeric.octal.arc",
+          "match": "\\b0[oO][0-7][0-7_]*\\b"
+        },
+        {
+          "name": "constant.numeric.float.arc",
+          "match": "\\b[0-9][0-9_]*\\.[0-9][0-9_]*(?:[eE][+\\-]?[0-9][0-9_]*)?\\b|\\b[0-9][0-9_]*[eE][+\\-]?[0-9][0-9_]*\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.arc",
+          "match": "\\b[0-9][0-9_]*\\b"
+        }
+      ]
+    },
+
+    "functions": {
+      "patterns": [
+        {
+          "comment": "Compiler intrinsics",
+          "name": "support.function.builtin.arc",
+          "match": "\\b(sizeof|alignof|bitcast|memptr|mem_zero|mem_copy|mem_move|mem_compare|len|syscall|va_start|va_arg|va_end|thread_id)\\b"
+        },
+        {
+          "comment": "Method call  .name(",
+          "match": "(\\.)([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": { "name": "punctuation.accessor.arc" },
+            "2": { "name": "entity.name.function.member.arc" }
+          }
+        },
+        {
+          "comment": "Plain member access  .name",
+          "match": "(\\.)([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "punctuation.accessor.arc" },
+            "2": { "name": "variable.other.member.arc" }
+          }
+        },
+        {
+          "comment": "Function call  name(",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": { "name": "entity.name.function.call.arc" }
+          }
+        }
+      ]
+    },
+
+    "operators": {
+      "patterns": [
+        {
+          "comment": "Lambda arrow =>",
+          "name": "keyword.operator.arrow.arc",
+          "match": "=>"
+        },
+        {
+          "comment": "Range .. and ...",
+          "name": "keyword.operator.range.arc",
+          "match": "\\.\\.\\.|\\.\\."
+        },
+        {
+          "comment": "Shift assign <<= >>=",
+          "name": "keyword.operator.assignment.compound.arc",
+          "match": "<<=|>>="
+        },
+        {
+          "comment": "Shift << >>",
+          "name": "keyword.operator.shift.arc",
+          "match": "<<|>>"
+        },
+        {
+          "comment": "Comparison == != <= >=",
+          "name": "keyword.operator.comparison.arc",
+          "match": "==|!=|<=|>="
+        },
+        {
+          "comment": "Logical && ||",
+          "name": "keyword.operator.logical.arc",
+          "match": "&&|\\|\\|"
+        },
+        {
+          "comment": "Increment decrement ++ --",
+          "name": "keyword.operator.increment-decrement.arc",
+          "match": "\\+\\+|--"
+        },
+        {
+          "comment": "Compound assignment += -= *= /= %= &= |= ^=",
+          "name": "keyword.operator.assignment.compound.arc",
+          "match": "\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^="
+        },
+        {
+          "comment": "Arithmetic + - * / %",
+          "name": "keyword.operator.arithmetic.arc",
+          "match": "\\+|-|\\*|/|%"
+        },
+        {
+          "comment": "Bitwise & | ^ ~ !",
+          "name": "keyword.operator.bitwise.arc",
+          "match": "&|\\||\\^|~|!"
+        },
+        {
+          "comment": "Comparison < >",
+          "name": "keyword.operator.comparison.arc",
+          "match": "<|>"
+        },
+        {
+          "comment": "Assignment =",
+          "name": "keyword.operator.assignment.arc",
+          "match": "(?<![=!<>+\\-*/%&|^])=(?!=)"
+        }
+      ]
+    }
+
+  }
+}

@@ -1,0 +1,15 @@
+//@test(expect = "bits=1065353216")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let f: float32 = 1.0
+    let bits = bit_cast<uint32>(f)
+    printf("bits=%u\n", bits)
+
+    return 0
+}

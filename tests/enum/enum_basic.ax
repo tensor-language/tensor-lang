@@ -1,0 +1,20 @@
+//@test(expect = "status=0")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+enum Status {
+    OK
+    ERROR
+    PENDING
+}
+
+func main() int32 {
+
+    let s: Status = Status.OK
+    printf("status=%d\n", s)
+
+    return 0
+}

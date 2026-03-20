@@ -1,0 +1,16 @@
+//@test(expect = "value=42")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x: int32 = 42
+    let vptr: *void = cast<*void>(&x)
+    let iptr: *int32 = cast<*int32>(vptr)
+    printf("value=%d\n", *iptr)
+
+    return 0
+}

@@ -1,0 +1,17 @@
+//@test(expect = "hello")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func greet() {
+    printf("hello\n")
+}
+
+func main() int32 {
+
+    greet()
+
+    return 0
+}

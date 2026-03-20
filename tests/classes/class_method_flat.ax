@@ -1,0 +1,23 @@
+//@test(expect = "value=77")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+class Counter {
+    value: int32
+}
+
+func get(self c: Counter) int32 {
+    return c.value
+}
+
+func main() int32 {
+
+    let counter = Counter{value: 77}
+    let val = counter.get()
+    printf("value=%d\n", val)
+
+    return 0
+}

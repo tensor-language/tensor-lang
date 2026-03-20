@@ -1,0 +1,14 @@
+//@test(expect = "bool=1")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let flag: bool = true
+    printf("bool=%d\n", flag)
+
+    return 0
+}

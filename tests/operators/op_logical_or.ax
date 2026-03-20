@@ -1,0 +1,14 @@
+//@test(expect = "or=1")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let result = false || true
+    printf("or=%d\n", result)
+
+    return 0
+}

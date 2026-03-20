@@ -1,0 +1,16 @@
+//@test(expect = "main\nthird\nsecond\nfirst")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    defer printf("first\n")
+    defer printf("second\n")
+    defer printf("third\n")
+    printf("main\n")
+
+    return 0
+}

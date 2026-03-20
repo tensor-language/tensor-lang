@@ -1,0 +1,16 @@
+//@test(expect = "condition_true")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x = 10
+    if x > 5 {
+        printf("condition_true\n")
+    }
+
+    return 0
+}

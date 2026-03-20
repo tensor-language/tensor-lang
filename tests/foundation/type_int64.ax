@@ -1,0 +1,14 @@
+//@test(expect = "int64=9223372036854775807")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let big: int64 = 9223372036854775807
+    printf("int64=%lld\n", big)
+
+    return 0
+}

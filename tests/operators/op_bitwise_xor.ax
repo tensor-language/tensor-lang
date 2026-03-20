@@ -1,0 +1,14 @@
+//@test(expect = "xor=240")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let result = 0xFF ^ 0x0F
+    printf("xor=%d\n", result)
+
+    return 0
+}

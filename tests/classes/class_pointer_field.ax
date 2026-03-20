@@ -1,0 +1,20 @@
+//@test(expect = "x=15")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+class Point {
+    x: int32
+    y: int32
+}
+
+func main() int32 {
+
+    let p = Point{x: 15, y: 25}
+    let ptr: *Point = &p
+    printf("x=%d\n", ptr.x)
+
+    return 0
+}

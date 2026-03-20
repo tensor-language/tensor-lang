@@ -1,0 +1,35 @@
+//@test(expect = "Writing to file...\nReading from file:\nHello from Arc file I/O!\n")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+    func fopen(*byte, *byte) *byte
+    func fprintf(*byte, *byte, ...) int32
+    func fclose(*byte) int32
+    func fgets(*byte, int32, *byte) *byte
+}
+
+func process_file(read_file: *byte) {
+    let buffer: [100]byte = {}
+    fgets(&buffer, 100, read_file)
+    fclose(read_file)
+    
+    printf("%s", &buffer)
+}
+
+func main() int32 {
+    printf("Writing to file...\n")
+    
+    // Write to file
+    let write_file: *byte = fopen("/tmp/test_read.txt", "w")
+    fprintf(write_file, "Hello from Arc file I/O!\n")
+    fclose(write_file)
+    
+    // Read from file
+    printf("Reading from file:\n")
+    let read_file: *byte = fopen("/tmp/test_read.txt", "r")
+
+    process_file(read_file)
+    
+    return 0
+}

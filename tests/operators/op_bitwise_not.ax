@@ -1,0 +1,15 @@
+//@test(expect = "not=240")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x: uint8 = 0x0F
+    let result = ~x
+    printf("not=%u\n", result)
+
+    return 0
+}

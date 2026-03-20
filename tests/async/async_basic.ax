@@ -1,0 +1,22 @@
+//@test(expect = "100")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+    func sleep(uint32) uint32
+}
+
+async func async_function() int32 {
+	sleep(1)
+	let results = 100
+	return results
+}
+
+func main() int32 {
+
+	let results = await async_function()
+    printf("%d\n", results)
+	sleep(4)
+
+    return 0
+}

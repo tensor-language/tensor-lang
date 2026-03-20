@@ -1,0 +1,13 @@
+//@test(expect = "extern_test")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    printf("extern_test\n")
+
+    return 0
+}

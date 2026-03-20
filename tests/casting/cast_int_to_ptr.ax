@@ -1,0 +1,13 @@
+//@test(expect = "ptr=0x1000")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+    let addr: uint64 = 0x1000
+    let ptr: *int32 = cast<*int32>(addr)
+    printf("ptr=%p\n", cast<*void>(ptr))
+    return 0
+}

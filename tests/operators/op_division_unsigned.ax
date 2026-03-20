@@ -1,0 +1,14 @@
+//@test(expect = "quot=5")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let quot: uint32 = 20 / 4
+    printf("quot=%u\n", quot)
+
+    return 0
+}

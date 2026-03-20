@@ -1,0 +1,14 @@
+//@test(expect = "line1\nline2")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let msg: string = "line1\nline2"
+    printf("%s\n", msg)
+
+    return 0
+}

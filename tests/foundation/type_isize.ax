@@ -1,0 +1,14 @@
+//@test(expect = "isize=-256")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let offset: isize = -256
+    printf("isize=%zd\n", offset)
+
+    return 0
+}

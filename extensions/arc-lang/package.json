@@ -1,0 +1,27 @@
+{
+  "name": "arc-lang",
+  "displayName": "Arc Language Support",
+  "description": "Syntax highlighting for Arc",
+  "version": "0.0.2",
+  "publisher": "arc-lang",
+  "repository": { "type": "git", "url": "https://github.com/arc-language/arc-lang" },
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "arc",
+      "aliases": ["Arc", "arc"],
+      "extensions": [".ax"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "arc",
+      "scopeName": "source.arc",
+      "path": "./syntaxes/arc.tmLanguage.json"
+    }]
+  }
+}

@@ -1,0 +1,19 @@
+//@test(expect = "size=8")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+struct Pair {
+    a: int32
+    b: int32
+}
+
+func main() int32 {
+
+    let size = sizeof(Pair)
+    printf("size=%zu\n", size)
+
+    return 0
+}

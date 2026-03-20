@@ -1,0 +1,22 @@
+//@test(expect = "result=30")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func double(x: int32) int32 {
+    return x * 2
+}
+
+func triple(x: int32) int32 {
+    return x * 3
+}
+
+func main() int32 {
+
+    let result = double(triple(5))
+    printf("result=%d\n", result)
+
+    return 0
+}

@@ -1,0 +1,20 @@
+//@test(expect = "code=404")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+enum HttpCode {
+    OK = 200
+    NOT_FOUND = 404
+    SERVER_ERROR = 500
+}
+
+func main() int32 {
+
+    let code: HttpCode = HttpCode.NOT_FOUND
+    printf("code=%d\n", code)
+
+    return 0
+}

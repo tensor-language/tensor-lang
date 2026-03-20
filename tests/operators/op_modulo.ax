@@ -1,0 +1,14 @@
+//@test(expect = "rem=2")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let rem = 17 % 5
+    printf("rem=%d\n", rem)
+
+    return 0
+}

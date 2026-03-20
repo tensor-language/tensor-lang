@@ -1,0 +1,21 @@
+//@test(expect = "result=0")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func check_positive(x: int32) int32 {
+    if x < 0 {
+        return 0
+    }
+    return x
+}
+
+func main() int32 {
+
+    let result = check_positive(-5)
+    printf("result=%d\n", result)
+
+    return 0
+}

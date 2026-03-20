@@ -1,0 +1,17 @@
+//@test(expect = "sum=30")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func print_sum(a: int32, b: int32) {
+    printf("sum=%d\n", a + b)
+}
+
+func main() int32 {
+
+    print_sum(10, 20)
+
+    return 0
+}

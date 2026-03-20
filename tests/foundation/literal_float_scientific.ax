@@ -1,0 +1,14 @@
+//@test(expect = "sci=0.0015")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x: float64 = 1.5e-3
+    printf("sci=%.4f\n", x)
+
+    return 0
+}

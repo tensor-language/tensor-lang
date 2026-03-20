@@ -1,0 +1,14 @@
+//@test(expect = "arr[0]=0")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let arr: [5]int32 = {}
+    printf("arr[0]=%d\n", arr[0])
+
+    return 0
+}

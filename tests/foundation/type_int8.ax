@@ -1,0 +1,14 @@
+//@test(expect = "int8=-128")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let small: int8 = -128
+    printf("int8=%d\n", small)
+
+    return 0
+}

@@ -1,0 +1,14 @@
+//@test(expect = "hello")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let msg: string = "hello"
+    printf("%s\n", msg)
+
+    return 0
+}

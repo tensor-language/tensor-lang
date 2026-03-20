@@ -1,0 +1,14 @@
+//@test(expect = "lt=1")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let result = (5 < 10)
+    printf("lt=%d\n", result)
+
+    return 0
+}

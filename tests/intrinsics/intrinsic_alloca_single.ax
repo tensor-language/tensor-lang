@@ -1,0 +1,15 @@
+//@test(expect = "value=777")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let ptr = alloca<int32>()
+    *ptr = 777
+    printf("value=%d\n", *ptr)
+
+    return 0
+}

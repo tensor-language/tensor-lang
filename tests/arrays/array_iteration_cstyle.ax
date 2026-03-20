@@ -1,0 +1,18 @@
+//@test(expect = "sum=10")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let arr: [4]int32 = {1, 2, 3, 4}
+    let sum = 0
+    for let i: usize = 0; i < 4; i++ {
+        sum += arr[i]
+    }
+    printf("sum=%d\n", sum)
+
+    return 0
+}

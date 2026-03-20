@@ -1,0 +1,19 @@
+//@test(expect = "product=6")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let product = 0
+    for let i = 1; i <= 3; i++ {
+        for let j = 1; j <= 2; j++ {
+            product = i * j
+        }
+    }
+    printf("product=%d\n", product)
+
+    return 0
+}

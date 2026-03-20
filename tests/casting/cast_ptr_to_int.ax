@@ -1,0 +1,16 @@
+//@test(expect = "addr_non_zero=1")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x: int32 = 99
+    let ptr: *int32 = &x
+    let addr: uint64 = cast<uint64>(ptr)
+    printf("addr_non_zero=%d\n", addr != 0)
+
+    return 0
+}

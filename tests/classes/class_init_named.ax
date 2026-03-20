@@ -1,0 +1,18 @@
+//@test(expect = "struct_defined")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+class Point {
+    x: int32
+    y: int32
+}
+
+func main() int32 {
+
+    printf("struct_defined\n")
+
+    return 0
+}

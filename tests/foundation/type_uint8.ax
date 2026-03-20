@@ -1,0 +1,14 @@
+//@test(expect = "uint8=255")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let byte_val: uint8 = 255
+    printf("uint8=%u\n", byte_val)
+
+    return 0
+}

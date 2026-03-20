@@ -1,0 +1,17 @@
+//@test(expect = "matrix[1][1]=4")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let matrix: [2][2]int32 = {
+        {1, 2},
+        {3, 4}
+    }
+    printf("matrix[1][1]=%d\n", matrix[1][1])
+
+    return 0
+}

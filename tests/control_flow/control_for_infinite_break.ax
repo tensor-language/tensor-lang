@@ -1,0 +1,20 @@
+//@test(expect = "i=5")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let i = 0
+    for {
+        i++
+        if i >= 5 {
+            break
+        }
+    }
+    printf("i=%d\n", i)
+
+    return 0
+}

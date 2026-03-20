@@ -1,0 +1,21 @@
+//@test(expect = "dest[1]=200")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let src = alloca<int32>(3)
+    src[0] = 100
+    src[1] = 200
+    src[2] = 300
+    
+    let dest = alloca<int32>(3)
+    memcpy(dest, src, 12)
+    
+    printf("dest[1]=%d\n", dest[1])
+
+    return 0
+}

@@ -1,0 +1,2 @@
+# Exclude ANTLR JAR
+build/antlr-4.13.2-complete.jar

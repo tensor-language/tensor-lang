@@ -1,0 +1,15 @@
+//@test(expect = "shr=-16")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x: int32 = -64
+    let result = x >> 2
+    printf("shr=%d\n", result)
+
+    return 0
+}

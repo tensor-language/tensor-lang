@@ -1,0 +1,16 @@
+//@test(expect = "ptr_is_null")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let ptr: *int32 = null
+    if ptr == null {
+        printf("ptr_is_null\n")
+    }
+
+    return 0
+}

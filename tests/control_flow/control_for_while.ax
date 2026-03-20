@@ -1,0 +1,17 @@
+//@test(expect = "count=3")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let count = 0
+    for count < 3 {
+        count++
+    }
+    printf("count=%d\n", count)
+
+    return 0
+}

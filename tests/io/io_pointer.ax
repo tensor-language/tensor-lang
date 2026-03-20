@@ -1,0 +1,26 @@
+//@test(expect = "Hello from Arc!\nFile written successfully\n")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+    func fopen(*byte, *byte) *byte
+    func fprintf(*byte, *byte, ...) int32
+    func fclose(*byte) int32
+}
+
+func process_file(file: *byte) {
+    fprintf(file, "This is a test\n")
+    fclose(file)
+    
+    printf("File written successfully\n")
+}
+
+func main() int32 {
+    printf("Hello from Arc!\n")
+    
+    // Write to a file
+    let file: *byte = fopen("/tmp/test.txt", "w")
+    process_file(file)
+    
+    return 0
+}

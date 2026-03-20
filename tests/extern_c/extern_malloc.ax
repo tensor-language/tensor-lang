@@ -1,0 +1,18 @@
+//@test(expect = "extern_test")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+    func malloc(usize) *void
+    func free(*void)
+}
+
+func main() int32 {
+    printf("extern_test\n")
+    let ptr = malloc(64)
+    if ptr != null {
+        printf("malloc_success\n")
+    }
+    free(ptr)
+    return 0
+}

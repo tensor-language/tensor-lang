@@ -1,0 +1,14 @@
+//@test(expect = "neg=-100")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x = -100
+    printf("neg=%d\n", x)
+
+    return 0
+}

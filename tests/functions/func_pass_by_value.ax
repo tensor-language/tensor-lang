@@ -1,0 +1,19 @@
+//@test(expect = "original=10")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func modify(x: int32) {
+    x = 99
+}
+
+func main() int32 {
+
+    let original = 10
+    modify(original)
+    printf("original=%d\n", original)
+
+    return 0
+}

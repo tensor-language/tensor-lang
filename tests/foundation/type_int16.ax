@@ -1,0 +1,14 @@
+//@test(expect = "int16=32000")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let medium: int16 = 32000
+    printf("int16=%d\n", medium)
+
+    return 0
+}

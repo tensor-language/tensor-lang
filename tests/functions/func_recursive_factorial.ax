@@ -1,0 +1,23 @@
+//@test(expect = "factorial=120")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+
+func factorial(n: int32) int32 {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+
+func main() int32 {
+
+    let result = factorial(5)
+    printf("factorial=%d\n", result)
+
+    return 0
+}

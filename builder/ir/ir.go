@@ -1,0 +1,794 @@
+package ir
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/arc-language/arc-lang/builder/types"
+)
+
+// CallingConvention defines how arguments are passed
+type CallingConvention int
+
+const (
+	CC_C          CallingConvention = iota // Default C convention (sysv64 on Linux, etc)
+	CC_StdCall                             // Windows stdcall
+	CC_FastCall                            // Fastcall
+	CC_VectorCall                          // Vectorcall (SIMD)
+	CC_ThisCall                            // C++ member functions
+	CC_Arc                                 // Internal Arc convention
+
+	// GPU/Accelerator conventions
+	CC_PTX
+	CC_ROCM
+	CC_TPU
+)
+
+func (cc CallingConvention) String() string {
+	switch cc {
+	case CC_C:
+		return "ccc"
+	case CC_StdCall:
+		return "x86_stdcallcc"
+	case CC_FastCall:
+		return "x86_fastcallcc"
+	case CC_VectorCall:
+		return "x86_vectorcallcc"
+	case CC_ThisCall:
+		return "x86_thiscallcc"
+	case CC_Arc:
+		return "arc_cc"
+	case CC_PTX:
+		return "ptx_kernel"
+	case CC_ROCM:
+		return "amdgpu_kernel"
+	case CC_TPU:
+		return "tpu_kernel"
+	}
+	return "ccc"
+}
+
+// Value is the interface all IR values implement
+type Value interface {
+	Type() types.Type
+	Name() string
+	SetName(string)
+	String() string
+}
+
+// User is a Value that references other Values (e.g. Instructions)
+type User interface {
+	Value
+	Operands() []Value
+	SetOperand(int, Value)
+	NumOperands() int
+}
+
+// TrackableValue is an interface for Values that track their Users (Use-Def chains).
+// Used for optimizations like Dead Code Elimination.
+type TrackableValue interface {
+	AddUser(User)
+	RemoveUser(User)
+}
+
+// Instruction is an operation that produces a value
+type Instruction interface {
+	User
+	Opcode() Opcode
+	Parent() *BasicBlock
+	SetParent(*BasicBlock)
+	IsTerminator() bool
+}
+
+// Opcode represents the operation type
+type Opcode int
+
+const (
+	// Terminator instructions
+	OpRet Opcode = iota
+	OpBr
+	OpCondBr
+	OpSwitch
+	OpUnreachable
+
+	// Binary operations
+	OpAdd
+	OpSub
+	OpMul
+	OpUDiv
+	OpSDiv
+	OpURem
+	OpSRem
+	OpFAdd
+	OpFSub
+	OpFMul
+	OpFDiv
+	OpFRem
+
+	// Bitwise binary operations
+	OpShl
+	OpLShr
+	OpAShr
+	OpAnd
+	OpOr
+	OpXor
+
+	// Memory operations
+	OpAlloca
+	OpLoad
+	OpStore
+	OpGetElementPtr
+
+	// Cast operations
+	OpTrunc
+	OpZExt
+	OpSExt
+	OpFPTrunc
+	OpFPExt
+	OpFPToUI
+	OpFPToSI
+	OpUIToFP
+	OpSIToFP
+	OpPtrToInt
+	OpIntToPtr
+	OpBitcast
+
+	// Other operations
+	OpICmp
+	OpFCmp
+	OpPhi
+	OpSelect
+	OpCall
+	OpSyscall
+	OpExtractValue
+	OpInsertValue
+
+	// Variadic argument operations
+	OpVaStart
+	OpVaArg
+	OpVaEnd
+
+	// Intrinsic operations
+	OpSizeOf
+	OpAlignOf
+	OpMemSet
+	OpMemCpy
+	OpMemMove
+	OpStrLen
+	OpMemChr
+	OpMemCmp
+	OpRaise
+
+	// Async Smart Thread operations
+	OpAsyncTaskCreate
+	OpAsyncTaskAwait
+
+	OpProcessCreate
+)
+
+var opcodeNames = map[Opcode]string{
+	OpRet:             "ret",
+	OpBr:              "br",
+	OpCondBr:          "br",
+	OpSwitch:          "switch",
+	OpUnreachable:     "unreachable",
+	OpAdd:             "add",
+	OpSub:             "sub",
+	OpMul:             "mul",
+	OpUDiv:            "udiv",
+	OpSDiv:            "sdiv",
+	OpURem:            "urem",
+	OpSRem:            "srem",
+	OpFAdd:            "fadd",
+	OpFSub:            "fsub",
+	OpFMul:            "fmul",
+	OpFDiv:            "fdiv",
+	OpFRem:            "frem",
+	OpShl:             "shl",
+	OpLShr:            "lshr",
+	OpAShr:            "ashr",
+	OpAnd:             "and",
+	OpOr:              "or",
+	OpXor:             "xor",
+	OpAlloca:          "alloca",
+	OpLoad:            "load",
+	OpStore:           "store",
+	OpGetElementPtr:   "getelementptr",
+	OpTrunc:           "trunc",
+	OpZExt:            "zext",
+	OpSExt:            "sext",
+	OpFPTrunc:         "fptrunc",
+	OpFPExt:           "fpext",
+	OpFPToUI:          "fptoui",
+	OpFPToSI:          "fptosi",
+	OpUIToFP:          "uitofp",
+	OpSIToFP:          "sitofp",
+	OpPtrToInt:        "ptrtoint",
+	OpIntToPtr:        "inttoptr",
+	OpBitcast:         "bitcast",
+	OpICmp:            "icmp",
+	OpFCmp:            "fcmp",
+	OpPhi:             "phi",
+	OpSelect:          "select",
+	OpCall:            "call",
+	OpSyscall:         "syscall",
+	OpExtractValue:    "extractvalue",
+	OpInsertValue:     "insertvalue",
+	OpVaStart:         "va_start",
+	OpVaArg:           "va_arg",
+	OpVaEnd:           "va_end",
+	OpSizeOf:          "sizeof",
+	OpAlignOf:         "alignof",
+	OpMemSet:          "memset",
+	OpMemCpy:          "memcpy",
+	OpMemMove:         "memmove",
+	OpStrLen:          "strlen",
+	OpMemChr:          "memchr",
+	OpMemCmp:          "memcmp",
+	OpRaise:           "raise",
+	OpAsyncTaskCreate: "async_task_create",
+	OpAsyncTaskAwait:  "async_task_await",
+	OpProcessCreate:   "process_create",
+}
+
+func (op Opcode) String() string {
+	if name, ok := opcodeNames[op]; ok {
+		return name
+	}
+	return fmt.Sprintf("op%d", op)
+}
+
+// ICmpPredicate represents integer comparison predicates
+type ICmpPredicate int
+
+const (
+	ICmpEQ  ICmpPredicate = iota // equal
+	ICmpNE                       // not equal
+	ICmpUGT                      // unsigned greater than
+	ICmpUGE                      // unsigned greater or equal
+	ICmpULT                      // unsigned less than
+	ICmpULE                      // unsigned less or equal
+	ICmpSGT                      // signed greater than
+	ICmpSGE                      // signed greater or equal
+	ICmpSLT                      // signed less than
+	ICmpSLE                      // signed less or equal
+)
+
+var icmpNames = map[ICmpPredicate]string{
+	ICmpEQ: "eq", ICmpNE: "ne",
+	ICmpUGT: "ugt", ICmpUGE: "uge", ICmpULT: "ult", ICmpULE: "ule",
+	ICmpSGT: "sgt", ICmpSGE: "sge", ICmpSLT: "slt", ICmpSLE: "sle",
+}
+
+func (p ICmpPredicate) String() string { return icmpNames[p] }
+
+// FCmpPredicate represents floating point comparison predicates
+type FCmpPredicate int
+
+const (
+	FCmpFalse FCmpPredicate = iota // always false
+	FCmpOEQ                        // ordered and equal
+	FCmpOGT                        // ordered and greater than
+	FCmpOGE                        // ordered and greater or equal
+	FCmpOLT                        // ordered and less than
+	FCmpOLE                        // ordered and less or equal
+	FCmpONE                        // ordered and not equal
+	FCmpORD                        // ordered (no NaN)
+	FCmpUNO                        // unordered (either NaN)
+	FCmpUEQ                        // unordered or equal
+	FCmpUGT                        // unordered or greater than
+	FCmpUGE                        // unordered or greater or equal
+	FCmpULT                        // unordered or less than
+	FCmpULE                        // unordered or less or equal
+	FCmpUNE                        // unordered or not equal
+	FCmpTrue                       // always true
+)
+
+var fcmpNames = map[FCmpPredicate]string{
+	FCmpFalse: "false", FCmpOEQ: "oeq", FCmpOGT: "ogt", FCmpOGE: "oge",
+	FCmpOLT: "olt", FCmpOLE: "ole", FCmpONE: "one", FCmpORD: "ord",
+	FCmpUNO: "uno", FCmpUEQ: "ueq", FCmpUGT: "ugt", FCmpUGE: "uge",
+	FCmpULT: "ult", FCmpULE: "ule", FCmpUNE: "une", FCmpTrue: "true",
+}
+
+func (p FCmpPredicate) String() string { return fcmpNames[p] }
+
+// BaseValue provides common functionality for all values
+type BaseValue struct {
+	ValName string
+	ValType types.Type
+	Users   map[User]bool // Optimization: Tracks instructions using this value
+}
+
+func (v *BaseValue) Name() string         { return v.ValName }
+func (v *BaseValue) SetName(n string)     { v.ValName = n }
+func (v *BaseValue) Type() types.Type     { return v.ValType }
+func (v *BaseValue) SetType(t types.Type) { v.ValType = t }
+
+// AddUser registers a user (Instruction) that depends on this value.
+func (v *BaseValue) AddUser(u User) {
+	if v.Users == nil {
+		v.Users = make(map[User]bool)
+	}
+	v.Users[u] = true
+}
+
+// RemoveUser unregisters a user when it no longer depends on this value.
+func (v *BaseValue) RemoveUser(u User) {
+	if v.Users != nil {
+		delete(v.Users, u)
+	}
+}
+
+// BaseInstruction provides common functionality for instructions
+type BaseInstruction struct {
+	BaseValue
+	Ops     []Value
+	Parent_ *BasicBlock
+	Op      Opcode
+
+	// Self points to the outer concrete instruction struct (e.g., *AddInst).
+	// Required to register the correct identity in Use-Def chains.
+	Self User
+}
+
+func (i *BaseInstruction) Opcode() Opcode              { return i.Op }
+func (i *BaseInstruction) Parent() *BasicBlock         { return i.Parent_ }
+func (i *BaseInstruction) SetParent(b *BasicBlock)     { i.Parent_ = b }
+func (i *BaseInstruction) Operands() []Value           { return i.Ops }
+func (i *BaseInstruction) NumOperands() int            { return len(i.Ops) }
+
+// String implements Value interface.
+// This is a fallback; concrete instructions should override this.
+func (i *BaseInstruction) String() string {
+	return fmt.Sprintf("<instruction %s>", i.Op)
+}
+
+// SetOperand sets the operand at the given index and updates Use-Def chains.
+func (i *BaseInstruction) SetOperand(idx int, v Value) {
+	// Grow slice if needed
+	for len(i.Ops) <= idx {
+		i.Ops = append(i.Ops, nil)
+	}
+
+	// Use i.Self if available, otherwise fallback to i (mostly for early initialization)
+	var user User = i
+	if i.Self != nil {
+		user = i.Self
+	}
+
+	// Unregister from old operand
+	if old := i.Ops[idx]; old != nil {
+		if tracker, ok := old.(TrackableValue); ok {
+			tracker.RemoveUser(user)
+		}
+	}
+
+	// Set new operand
+	i.Ops[idx] = v
+
+	// Register to new operand
+	if v != nil {
+		if tracker, ok := v.(TrackableValue); ok {
+			tracker.AddUser(user)
+		}
+	}
+}
+
+func (i *BaseInstruction) IsTerminator() bool {
+	switch i.Op {
+	case OpRet, OpBr, OpCondBr, OpSwitch, OpUnreachable:
+		return true
+	}
+	return false
+}
+
+// Constant values
+type Constant interface {
+	Value
+	isConstant()
+}
+
+// ConstantInt represents an integer constant
+type ConstantInt struct {
+	BaseValue
+	Value int64
+}
+
+func (c *ConstantInt) isConstant() {}
+func (c *ConstantInt) String() string {
+	return fmt.Sprintf("%s %d", c.ValType, c.Value)
+}
+
+// ConstantFloat represents a floating point constant
+type ConstantFloat struct {
+	BaseValue
+	Value float64
+}
+
+func (c *ConstantFloat) isConstant() {}
+func (c *ConstantFloat) String() string {
+	return fmt.Sprintf("%s %g", c.ValType, c.Value)
+}
+
+// ConstantNull represents a null pointer
+type ConstantNull struct {
+	BaseValue
+}
+
+func (c *ConstantNull) isConstant() {}
+func (c *ConstantNull) String() string {
+	return fmt.Sprintf("%s null", c.ValType)
+}
+
+// ConstantUndef represents an undefined value
+type ConstantUndef struct {
+	BaseValue
+}
+
+func (c *ConstantUndef) isConstant() {}
+func (c *ConstantUndef) String() string {
+	return fmt.Sprintf("%s undef", c.ValType)
+}
+
+// ConstantArray represents an array constant
+type ConstantArray struct {
+	BaseValue
+	Elements []Constant
+}
+
+func (c *ConstantArray) isConstant() {}
+func (c *ConstantArray) String() string {
+	elems := make([]string, len(c.Elements))
+	for i, e := range c.Elements {
+		elems[i] = e.String()
+	}
+	return fmt.Sprintf("%s [%s]", c.ValType, strings.Join(elems, ", "))
+}
+
+// ConstantStruct represents a struct constant
+type ConstantStruct struct {
+	BaseValue
+	Fields []Constant
+}
+
+func (c *ConstantStruct) isConstant() {}
+func (c *ConstantStruct) String() string {
+	fields := make([]string, len(c.Fields))
+	for i, f := range c.Fields {
+		fields[i] = f.String()
+	}
+	return fmt.Sprintf("%s { %s }", c.ValType, strings.Join(fields, ", "))
+}
+
+// ConstantZero represents a zero initializer for any type
+type ConstantZero struct {
+	BaseValue
+}
+
+func (c *ConstantZero) isConstant() {}
+func (c *ConstantZero) String() string {
+	return fmt.Sprintf("%s zeroinitializer", c.ValType)
+}
+
+// Global represents a global variable or constant
+type Global struct {
+	BaseValue
+	Initializer  Constant
+	IsConstant   bool
+	Linkage      Linkage
+	AddressSpace int
+}
+
+func (g *Global) String() string {
+	var parts []string
+	parts = append(parts, fmt.Sprintf("@%s =", g.ValName))
+	parts = append(parts, g.Linkage.String())
+	if g.IsConstant {
+		parts = append(parts, "constant")
+	} else {
+		parts = append(parts, "global")
+	}
+	if g.Initializer != nil {
+		parts = append(parts, g.Initializer.String())
+	} else {
+		if ptrTy, ok := g.ValType.(*types.PointerType); ok {
+			parts = append(parts, ptrTy.ElementType.String())
+		} else {
+			parts = append(parts, g.ValType.String())
+		}
+	}
+	return strings.Join(parts, " ")
+}
+
+// Linkage types for globals and functions
+type Linkage int
+
+const (
+	ExternalLinkage Linkage = iota
+	InternalLinkage
+	PrivateLinkage
+	LinkOnceODRLinkage
+	WeakODRLinkage
+	CommonLinkage
+)
+
+func (l Linkage) String() string {
+	switch l {
+	case ExternalLinkage:
+		return "external"
+	case InternalLinkage:
+		return "internal"
+	case PrivateLinkage:
+		return "private"
+	case LinkOnceODRLinkage:
+		return "linkonce_odr"
+	case WeakODRLinkage:
+		return "weak_odr"
+	case CommonLinkage:
+		return "common"
+	}
+	return "external"
+}
+
+// Argument represents a function argument
+type Argument struct {
+	BaseValue
+	Index  int
+	Parent *Function
+}
+
+func (a *Argument) String() string {
+	if a.ValName != "" {
+		return fmt.Sprintf("%s %%%s", a.ValType, a.ValName)
+	}
+	return fmt.Sprintf("%s %%%d", a.ValType, a.Index)
+}
+
+// BasicBlock represents a basic block in the CFG
+type BasicBlock struct {
+	BaseValue
+	Instructions []Instruction
+	Parent       *Function
+	Predecessors []*BasicBlock
+	Successors   []*BasicBlock
+}
+
+func NewBasicBlock(name string) *BasicBlock {
+	return &BasicBlock{
+		BaseValue: BaseValue{ValName: name, ValType: types.Label},
+	}
+}
+
+func (b *BasicBlock) String() string {
+	var sb strings.Builder
+	sb.WriteString(b.ValName)
+	sb.WriteString(":\n")
+	for _, inst := range b.Instructions {
+		sb.WriteString("  ")
+		sb.WriteString(inst.String())
+		sb.WriteString("\n")
+	}
+	return sb.String()
+}
+
+func (b *BasicBlock) AddInstruction(inst Instruction) {
+	inst.SetParent(b)
+	b.Instructions = append(b.Instructions, inst)
+}
+
+func (b *BasicBlock) Terminator() Instruction {
+	if len(b.Instructions) == 0 {
+		return nil
+	}
+	last := b.Instructions[len(b.Instructions)-1]
+	if last.IsTerminator() {
+		return last
+	}
+	return nil
+}
+
+// Function represents a function
+type Function struct {
+	BaseValue
+	FuncType   *types.FunctionType
+	Blocks     []*BasicBlock
+	Arguments  []*Argument
+	Linkage    Linkage
+	CallConv   CallingConvention
+	Parent     *Module
+	Attributes []FuncAttribute
+}
+
+type FuncAttribute int
+
+const (
+	AttrNoReturn FuncAttribute = iota
+	AttrNoUnwind
+	AttrReadOnly
+	AttrReadNone
+	AttrAlwaysInline
+	AttrNoInline
+	AttrCoroutine
+)
+
+func NewFunction(name string, fnType *types.FunctionType) *Function {
+	f := &Function{
+		BaseValue: BaseValue{ValName: name, ValType: fnType},
+		FuncType:  fnType,
+	}
+	// Create arguments
+	for i, paramType := range fnType.ParamTypes {
+		arg := &Argument{
+			BaseValue: BaseValue{ValType: paramType},
+			Index:     i,
+			Parent:    f,
+		}
+		f.Arguments = append(f.Arguments, arg)
+	}
+	return f
+}
+
+func (f *Function) AddBlock(b *BasicBlock) {
+	b.Parent = f
+	f.Blocks = append(f.Blocks, b)
+}
+
+func (f *Function) EntryBlock() *BasicBlock {
+	if len(f.Blocks) > 0 {
+		return f.Blocks[0]
+	}
+	return nil
+}
+
+func (f *Function) String() string {
+	var sb strings.Builder
+
+	// Declaration vs definition
+	if len(f.Blocks) == 0 {
+		sb.WriteString("declare ")
+	} else {
+		sb.WriteString("define ")
+	}
+
+	sb.WriteString(f.Linkage.String())
+	sb.WriteString(" ")
+	sb.WriteString(f.CallConv.String())
+	sb.WriteString(" ")
+	sb.WriteString(f.FuncType.ReturnType.String())
+	sb.WriteString(" @")
+	sb.WriteString(f.ValName)
+	sb.WriteString("(")
+
+	args := make([]string, len(f.Arguments))
+	for i, arg := range f.Arguments {
+		if arg.ValName != "" {
+			args[i] = fmt.Sprintf("%s %%%s", arg.ValType, arg.ValName)
+		} else {
+			args[i] = arg.ValType.String()
+		}
+	}
+	sb.WriteString(strings.Join(args, ", "))
+	if f.FuncType.Variadic {
+		if len(args) > 0 {
+			sb.WriteString(", ")
+		}
+		sb.WriteString("...")
+	}
+	sb.WriteString(")")
+
+	// Attributes
+	for _, attr := range f.Attributes {
+		sb.WriteString(" ")
+		switch attr {
+		case AttrNoReturn:
+			sb.WriteString("noreturn")
+		case AttrNoUnwind:
+			sb.WriteString("nounwind")
+		case AttrReadOnly:
+			sb.WriteString("readonly")
+		case AttrReadNone:
+			sb.WriteString("readnone")
+		case AttrAlwaysInline:
+			sb.WriteString("alwaysinline")
+		case AttrNoInline:
+			sb.WriteString("noinline")
+		}
+	}
+
+	if len(f.Blocks) > 0 {
+		sb.WriteString(" {\n")
+		for _, block := range f.Blocks {
+			sb.WriteString(block.String())
+		}
+		sb.WriteString("}")
+	}
+
+	return sb.String()
+}
+
+// Module represents a compilation unit
+type Module struct {
+	Name         string
+	Functions    []*Function
+	Globals      []*Global
+	Types        map[string]*types.StructType
+	DataLayout   string
+	TargetTriple string
+}
+
+func NewModule(name string) *Module {
+	return &Module{
+		Name:  name,
+		Types: make(map[string]*types.StructType),
+	}
+}
+
+func (m *Module) AddFunction(f *Function) {
+	f.Parent = m
+	m.Functions = append(m.Functions, f)
+}
+
+func (m *Module) AddGlobal(g *Global) {
+	m.Globals = append(m.Globals, g)
+}
+
+func (m *Module) GetFunction(name string) *Function {
+	for _, f := range m.Functions {
+		if f.ValName == name {
+			return f
+		}
+	}
+	return nil
+}
+
+func (m *Module) GetGlobal(name string) *Global {
+	for _, g := range m.Globals {
+		if g.ValName == name {
+			return g
+		}
+	}
+	return nil
+}
+
+func (m *Module) String() string {
+	var sb strings.Builder
+
+	if m.DataLayout != "" {
+		sb.WriteString(fmt.Sprintf("target datalayout = \"%s\"\n", m.DataLayout))
+	}
+	if m.TargetTriple != "" {
+		sb.WriteString(fmt.Sprintf("target triple = \"%s\"\n", m.TargetTriple))
+	}
+	if m.DataLayout != "" || m.TargetTriple != "" {
+		sb.WriteString("\n")
+	}
+
+	// Named types
+	for name, typ := range m.Types {
+		sb.WriteString(fmt.Sprintf("%%%s = type %s\n", name, typ.DefString()))
+	}
+	if len(m.Types) > 0 {
+		sb.WriteString("\n")
+	}
+
+	// Globals
+	for _, g := range m.Globals {
+		sb.WriteString(g.String())
+		sb.WriteString("\n")
+	}
+	if len(m.Globals) > 0 {
+		sb.WriteString("\n")
+	}
+
+	// Functions
+	for i, f := range m.Functions {
+		if i > 0 {
+			sb.WriteString("\n")
+		}
+		sb.WriteString(f.String())
+		sb.WriteString("\n")
+	}
+
+	return sb.String()
+}

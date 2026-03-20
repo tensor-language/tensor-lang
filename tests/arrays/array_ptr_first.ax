@@ -1,0 +1,15 @@
+//@test(expect = "first=100")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let arr: [3]int32 = {100, 200, 300}
+    let ptr: *int32 = &arr[0]
+    printf("first=%d\n", *ptr)
+
+    return 0
+}

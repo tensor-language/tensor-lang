@@ -1,0 +1,14 @@
+//@test(expect = "diff=35")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let diff = 50 - 15
+    printf("diff=%d\n", diff)
+
+    return 0
+}

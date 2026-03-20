@@ -1,0 +1,27 @@
+//@test(expect = "end_x=10")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+class Point {
+    x: int32
+    y: int32
+}
+
+class Line {
+    start: Point
+    end: Point
+}
+
+func main() int32 {
+
+    let line = Line{
+        start: Point{x: 0, y: 0},
+        end: Point{x: 10, y: 10}
+    }
+    printf("end_x=%d\n", line.end.x)
+
+    return 0
+}

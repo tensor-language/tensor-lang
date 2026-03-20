@@ -1,0 +1,15 @@
+//@test(expect = "float=42.0")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let i: int32 = 42
+    let f: float32 = cast<float32>(i)
+    printf("float=%.1f\n", f)
+
+    return 0
+}

@@ -1,0 +1,14 @@
+//@test(expect = "size=8")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let size = sizeof(int64)
+    printf("size=%zu\n", size)
+
+    return 0
+}

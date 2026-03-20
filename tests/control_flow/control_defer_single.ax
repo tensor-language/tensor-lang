@@ -1,0 +1,15 @@
+//@test(expect = "before\nafter\ndeferred")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    printf("before\n")
+    defer printf("deferred\n")
+    printf("after\n")
+
+    return 0
+}

@@ -1,0 +1,14 @@
+//@test(expect = "int32=2147483647")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x: int32 = 2147483647
+    printf("int32=%d\n", x)
+
+    return 0
+}

@@ -1,0 +1,15 @@
+//@test(expect = "len=5")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let str: *byte = "hello"
+    let len = strlen(str)
+    printf("len=%zu\n", len)
+
+    return 0
+}

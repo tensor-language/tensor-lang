@@ -1,0 +1,19 @@
+//@test(expect = "both_true")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x = 10
+    let y = 20
+    if x > 5 {
+        if y > 15 {
+            printf("both_true\n")
+        }
+    }
+
+    return 0
+}

@@ -1,0 +1,20 @@
+//@test(expect = "age=30 height=180 weight=75")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+struct Person {
+    age: int32
+    height: int32
+    weight: int32
+}
+
+func main() int32 {
+
+    let person = Person{age: 30, height: 180, weight: 75}
+    printf("age=%d height=%d weight=%d\n", person.age, person.height, person.weight)
+
+    return 0
+}

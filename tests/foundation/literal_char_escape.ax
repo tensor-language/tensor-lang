@@ -1,0 +1,15 @@
+//@test(expect = "escape_test\nok")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let newline: char = '\n'
+    let tab: char = '\t'
+    printf("escape_test%cok\n", newline)
+
+    return 0
+}

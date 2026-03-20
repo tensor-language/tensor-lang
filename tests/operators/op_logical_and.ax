@@ -1,0 +1,14 @@
+//@test(expect = "and=1")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let result = true && true
+    printf("and=%d\n", result)
+
+    return 0
+}

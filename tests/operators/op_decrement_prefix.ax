@@ -1,0 +1,15 @@
+//@test(expect = "new=9")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x = 10
+    let new_val = --x
+    printf("new=%d\n", new_val)
+
+    return 0
+}

@@ -1,0 +1,14 @@
+//@test(expect = "result=20")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let result = (2 + 3) * 4
+    printf("result=%d\n", result)
+
+    return 0
+}

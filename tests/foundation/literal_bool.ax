@@ -1,0 +1,15 @@
+//@test(expect = "true=1 false=0")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let t = true
+    let f = false
+    printf("true=%d false=%d\n", t, f)
+
+    return 0
+}

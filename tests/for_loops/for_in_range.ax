@@ -1,0 +1,17 @@
+//@test(expect = "sum=10")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let sum = 0
+    for i in 0..5 {
+        sum += i
+    }
+    printf("sum=%d\n", sum)
+
+    return 0
+}

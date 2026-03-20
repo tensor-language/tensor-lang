@@ -1,0 +1,21 @@
+//@test(expect = "other")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func main() int32 {
+
+    let x = 99
+    switch x {
+        case 1:
+            printf("one\n")
+        case 2:
+            printf("two\n")
+        default:
+            printf("other\n")
+    }
+
+    return 0
+}

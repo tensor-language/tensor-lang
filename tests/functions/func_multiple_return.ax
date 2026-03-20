@@ -1,0 +1,23 @@
+//@test(expect = "result=5 ok=1")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+
+func divide(a: int32, b: int32) (int32, bool) {
+    if b == 0 {
+        return (0, false)
+    }
+    return (a / b, true)
+}
+
+
+func main() int32 {
+
+    let (result, ok) = divide(10, 2)
+    printf("result=%d ok=%d\n", result, ok)
+
+    return 0
+}

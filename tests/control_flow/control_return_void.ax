@@ -1,0 +1,19 @@
+//@test(expect = "before_return\ndone")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func test_return() {
+    printf("before_return\n")
+    return
+}
+
+func main() int32 {
+
+    test_return()
+    printf("done\n")
+
+    return 0
+}

@@ -1,0 +1,18 @@
+//@test(expect = "result=99")
+namespace main
+
+extern c {
+    func printf(*byte, ...) int32
+}
+
+func identity<T>(x: T) T {
+    return x
+}
+
+func main() int32 {
+
+    let result = identity<int32>(99)
+    printf("result=%d\n", result)
+
+    return 0
+}

@@ -1,0 +1,35 @@
+//@test(expect = "start\nend\ncleanup_called")
+namespace main
+
+extern c {
+    func fopen(*byte, *byte) *byte
+    func fprintf(*byte, *byte, ...) int32
+    func fclose(*byte) int32
+    func fread(*byte, uint64, uint64, *byte) uint64
+    func printf(*byte, ...) int32
+    func memset(*byte, int32, uint64) *byte
+}
+
+func cleanup(file: *byte) {
+    fprintf(file, "cleanup_called\n")
+    fclose(file)
+    
+    // Reopen and read back the file to stdout
+    let read_file: *byte = fopen("/tmp/myfile.txt", "r")
+    let buffer: [100]byte = {}
+    fread(&buffer, 1, 100, read_file)
+    fclose(read_file)
+    
+    // Print to stdout for test verification
+    printf("%s", &buffer)
+}
+
+func main() int32 {
+    let file: *byte = fopen("/tmp/myfile.txt", "w")
+    
+    fprintf(file, "start\n")
+    defer cleanup(file)
+    fprintf(file, "end\n")
+    
+    return 0
+}
